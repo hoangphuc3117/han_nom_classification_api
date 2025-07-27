@@ -1,0 +1,11 @@
+fastapi
+pydantic
+pytest
+Pillow
+fastapi[standard]
+paddlepaddle
+paddlex
+paddlex[base]
+opencv-python-headless
+setuptools
+pypdfium2
