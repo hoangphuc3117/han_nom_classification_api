@@ -5,3 +5,4 @@ Pillow
 fastapi[standard]
 paddlepaddle
 paddleocr
+kagglehub
