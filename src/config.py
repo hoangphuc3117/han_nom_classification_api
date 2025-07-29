@@ -1,20 +1,15 @@
-# Configuration for classification thresholds
-NOM_THRESHOLD_TXT = 10
-NOM_THRESHOLD_IMG = 4
-
-# Example list of Nom characters (should be replaced with the actual list)
-TOP_PURE_NOM = set([
-    '𠊛', '𥪝', '𦤾', '𠓨', '𡗉', '𨕭', '𦓡', '𠱊', '𢆥', '𨉟', '𠫾', '𡥵', '𠄩', '𣈜', '𨖲', '𡢐', '𤯩', '𢧚', '𧡊', '𠄼', '㛪', '𣅶', '𣎃', '𣗓', '𡘯', '𠀧', '𥘷', '𥏌',
-    '𠸜', '𡀯', '𥆾', '𤞦', '𢬣', '𢝙', '咹', '𢞅', '𡨌', '𡞕', '𣩂', '𥙩', '𦖑', '𢢲', '𠢞', '𡮈', '𠯆', '𠅍', '𨑜', '𧸝', '𩈘', '𣋀', '𤀘', '𠳒', '𤳄', '𢚸', '𣦍', '𧵆', '𧷸',
-    '𧿨', '𠸥', '𢣂', '𣘃', '𠁀', '𤲂', '﨤', '眜', '𠶢', '𡎥', '𣇞', '𦘧', '𡛔', '𣋚', '𢲧', '𡨹', '𡗶', '𠳨', '𦣰', '𦣰', '𨖅', '𣛠', '𡥙', '𠁂', '𨱽', '𣎀', '𨷶', '𠬃', '𥹰',
-    '𠹲', '𡗋', '𡦂', '𣷷', '𤎜', '𧼋', '𤤰', '𠸒', '𣛤', '𠄧', '𣊾', '𢷮', '𨷑', '𨀈', '𨅸', '𡮣', '𣇜', '𢞂', '𨔈', '𠖤', '𢗼', '𡊲', '𡖡', '𤖹', '𠭤', '𠃣', '𤽸', '𧁷', '𤗲',
-    '𩃳', '𣈖', '𤊡', '𧆄', '𠹾', '𤾓', '𦓅', '𥐉', '𦊚', '𢜝', '𨑻', '𢟘', '𧹼', '𡶀', '𦒹', '𩵜', '𨢇', '𡚢', '𠅳', '䬔', '𠋥', '𩅹', '𠋺', '𨑮', '𥩯', '𠰺', '𥄬', '焒', '𤳇',
-    '𡏦', '𧖱', '㹥', '𢜠', '萻', '𪀄', '𢺺', '畑', '𢷮', '𤙭', '𠔭', '𠦳', '葻', '𠃩', '𤯆', '𩄲', '𦝄', '䏾', '𣟮', '𥾘', '𡽫', '𡉕', '𢩮', '𡎝', '𤄯', '𠳐'
-])
-
 # Layout detection configuration
 LAYOUT_DETECTION_CONFIG = {
-    "model_name": "PP-DocLayout_plus-L",
-    "model_dir": "models/pp-doclayout_plus-L",
-    "device": "cpu"
+    "model_name": "PP-DocLayout-L",
+    "model_dir": "models/layout_detection",
+}
+
+TEXT_DETECTION_CONFIG = {
+    "model_name": "PP-OCRv5_server_det",
+    "model_dir": "models/text_detection",
+}
+
+TEXT_RECOGNITION_CONFIG = {
+    "model_name": "PP-OCRv5_server_rec",
+    "model_dir": "models/text_recognition"
 }

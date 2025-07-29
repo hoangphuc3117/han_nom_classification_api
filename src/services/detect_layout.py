@@ -3,9 +3,9 @@
 import os
 import tempfile
 import json
-from typing import Optional, List, Any, Dict
-from paddlex import create_model
-from ..config import LAYOUT_DETECTION_CONFIG
+from typing import Any, Dict
+from paddleocr import PPStructureV3
+from ..config import LAYOUT_DETECTION_CONFIG, TEXT_DETECTION_CONFIG, TEXT_RECOGNITION_CONFIG
 
 
 class LayoutDetectorSingleton:
@@ -19,23 +19,33 @@ class LayoutDetectorSingleton:
         return cls._instance
     
     def initialize_model(self):
+        """Initialize the PP-Structure model for layout detection"""
         if not self._is_initialized:
-            model_dir = LAYOUT_DETECTION_CONFIG["model_dir"]
-            device = LAYOUT_DETECTION_CONFIG["device"]
-            model_name = LAYOUT_DETECTION_CONFIG["model_name"]
-            
-            print(f"Loading layout detection model: {model_name}")
-            
-            self._model = create_model(
-                model_name=model_name,
-                model_dir=model_dir,
-                device=device
-            )
-            self._is_initialized = True
+            try:
+                self._model = PPStructureV3(
+                    use_doc_orientation_classify=True,
+                    use_doc_unwarping=False,
+                    layout_detection_model_name=LAYOUT_DETECTION_CONFIG["model_name"],
+                    layout_detection_model_dir=LAYOUT_DETECTION_CONFIG["model_dir"],
+                    text_detection_model_name=TEXT_DETECTION_CONFIG["model_name"],
+                    text_detection_model_dir=TEXT_DETECTION_CONFIG["model_dir"],
+                    text_recognition_model_name=TEXT_RECOGNITION_CONFIG["model_name"],
+                    text_recognition_model_dir=TEXT_RECOGNITION_CONFIG["model_dir"],
+                    use_table_recognition=False,
+                    use_seal_recognition=False,
+                    use_chart_recognition=False,
+                    use_formula_recognition=False,
+                )
+                self._is_initialized = True
+                print("✅ Layout detection model initialized successfully")
+            except Exception as e:
+                print(f"❌ Error initializing layout detection model: {str(e)}")
+                raise e
     
     def get_model(self):
+        """Get the initialized model instance"""
         if not self._is_initialized:
-            raise RuntimeError("Model not initialized!")
+            raise RuntimeError("Model not initialized! Call initialize_model() first.")
         return self._model
 
 
@@ -43,49 +53,41 @@ class LayoutDetectorSingleton:
 _detector = LayoutDetectorSingleton()
 
 def initialize_layout_model():
+    """Initialize the layout detection model"""
     _detector.initialize_model()
 
 def _get_model():
+    """Get the initialized model instance"""
     return _detector.get_model()
 
 def detect_layout(
-    image_path: str,
-    batch_size: int = 1,
-    layout_nms: bool = True,
+    image_path: str
 ) -> Dict[str, Any]:
-    model = _get_model()
-    output = model.predict(image_path, batch_size=batch_size, layout_nms=layout_nms)
-    
-    # Convert output to JSON structure
-    json_data = {}
-    if output:
-        with tempfile.NamedTemporaryFile(mode='w', suffix=".json", delete=False) as tmp_json:
-            tmp_json_path = tmp_json.name
-            
-        try:
-            for res in output:
-                res.save_to_json(tmp_json_path)
-                break  
-                
-            with open(tmp_json_path, 'r', encoding='utf-8') as f:
-                json_data = json.load(f)
-                
-        finally:
-            if os.path.exists(tmp_json_path):
-                os.remove(tmp_json_path)
-    
-    return json_data
+    try:
+        model = _get_model()
+        print("Running layout detection prediction...")
+        raw_output = model.predict(input=image_path)
+        return str(raw_output)
+        
+    except Exception as e:
+        error_msg = f"Error during layout detection: {str(e)}"
+        return {
+            "status": "error",
+            "error_message": error_msg
+        }
 
 def detect_layout_from_bytes(
-    image_bytes: bytes,
-    batch_size: int = 1,
-    layout_nms: bool = True,
+    image_bytes: bytes
 ) -> Dict[str, Any]:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_file:
         tmp_file.write(image_bytes)
         tmp_img_path = tmp_file.name
     
     try:
-        return detect_layout(tmp_img_path, batch_size, layout_nms)
+        result = detect_layout(tmp_img_path)
+        return result
+    except Exception as e:
+        raise e
     finally:
-        os.remove(tmp_img_path)
+        if os.path.exists(tmp_img_path):
+            os.remove(tmp_img_path)
